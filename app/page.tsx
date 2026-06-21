@@ -219,7 +219,7 @@ export default function Home() {
           else addMsg({role:"assistant", content:`✅ **${file.name}** loaded! Ask me anything about it.`});
         } catch { addMsg({role:"assistant", content:`✅ **${file.name}** loaded!`}); }
         if (activeTab === "quiz" && newDocs.length > 0) {
-          setTimeout(() => generateQuizWithDocs(newDocs), 1000);
+          setTimeout(() => generateQuiz(), 1000);
         }
       }
       setTimeout(() => { setUploading(false); setUploadProgress(0); setUploadFileName(""); setSidebarOpen(false); }, 800);
@@ -892,6 +892,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
