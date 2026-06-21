@@ -151,7 +151,8 @@ export default function Home() {
 
   const fetchDocuments = async () => {
     try {
-      const r = await axios.get(`${API}/documents`);
+      const sid = typeof window !== "undefined" ? (localStorage.getItem("documind_session") || sessionId) : sessionId;
+      const r = await axios.get(`${API}/documents?session_id=${sid}`);
       setDocuments(r.data.documents || []);
     } catch {}
   };
@@ -898,6 +899,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
