@@ -197,8 +197,14 @@ export default function Home() {
     window.speechSynthesis.speak(u);
   };
 
+  const wakeUpBackend = async () => {
+    try { await axios.get(`${API}/health`, {timeout: 30000}); } catch {}
+  };
+
   const uploadFile = useCallback(async (file: File, type: "pdf"|"data" = "pdf") => {
-    setUploading(true); setUploadProgress(0); setUploadFileName(file.name);
+    setUploading(true); setUploadProgress(0); setUploadFileName("Waking up server... (30-60 sec first time)");
+    await wakeUpBackend();
+    setUploadFileName(file.name);
     const iv = setInterval(() => setUploadProgress(p => { if(p<40) return p+6; if(p<70) return p+3; if(p<85) return p+1; return p; }), 200);
     const fd = new FormData(); fd.append("file", file); fd.append("session_id", sessionId);
     try {
@@ -892,6 +898,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
