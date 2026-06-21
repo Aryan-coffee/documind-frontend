@@ -153,8 +153,10 @@ export default function Home() {
     try {
       const sid = typeof window !== "undefined" ? (localStorage.getItem("documind_session") || sessionId) : sessionId;
       const r = await axios.get(`${API}/documents?session_id=${sid}`);
-      setDocuments(r.data.documents || []);
-    } catch {}
+      const docs = r.data.documents || [];
+      setDocuments(docs);
+      return docs;
+    } catch { return []; }
   };
 
   const loadHistory = async () => {
@@ -316,20 +318,23 @@ export default function Home() {
     setLoading(true);
     try {
       const r = await axios.post(`${API}/compare`, {question:compareQ, doc1, doc2, session_id:sessionId});
-      addMsg({content:r.data.answer||r.data.error, sources:r.data.sources, confidence:r.data.confidence});
+      addMsg({content:r.data.answer||r.data.error||"No response", sources:r.data.sources, confidence:r.data.confidence});
     } catch { addMsg({content:"❌ Compare failed."}); }
     setLoading(false);
+    setCompareQ("");
   };
 
   const chatWithWebsite = async () => {
     if (!webUrl||!webQ||loading) return;
-    setMessages(p => [...p, {id:Math.random().toString(), role:"user", content:`🌐 ${webUrl}\n${webQ}`, time:now()}]);
+    const wMsg = `🌐 ${webUrl}\n${webQ}`;
+    setMessages(p => [...p, {id:Math.random().toString(), role:"user", content:wMsg, time:now()}]);
     setLoading(true);
     try {
       const r = await axios.post(`${API}/website-chat`, {url:webUrl, question:webQ, session_id:sessionId});
-      addMsg({content:r.data.answer||r.data.error});
-    } catch { addMsg({content:"❌ Website chat failed."}); }
+      addMsg({content:r.data.answer||r.data.error||"No response"});
+    } catch { addMsg({content:"❌ Website chat failed. Check URL."}); }
     setLoading(false);
+    setWebQ("");
   };
 
   const chatWithYoutube = async () => {
@@ -464,6 +469,7 @@ export default function Home() {
           {activeTab==="compare" && (
             <div>
               <div style={{fontSize:13,fontWeight:700,color:"#c7d2fe",marginBottom:10}}>🔀 Compare Two Documents</div>
+              <button onClick={fetchDocuments} style={{fontSize:10,color:"#6366f1",background:"none",border:"none",cursor:"pointer",marginBottom:6}}>🔄 Refresh documents</button>
               {documents.length < 2 ? (
                 <>
                   <div style={{padding:"12px",background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.2)",borderRadius:10,marginBottom:10,textAlign:"center"}}>
@@ -899,6 +905,10 @@ export default function Home() {
     </div>
   );
 }
+
+
+
+
 
 
 
